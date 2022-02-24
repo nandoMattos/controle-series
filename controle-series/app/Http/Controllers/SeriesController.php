@@ -2,13 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\EventoNovaSerie;
 use App\Http\Requests\SeriesFormRequest;
 use App\Models\Serie;
-use App\Models\Temporada;
 use App\Services\CriadorDeSerie;
 use App\Services\RemovedorSerie;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
 class SeriesController extends Controller
 {
@@ -28,11 +27,21 @@ class SeriesController extends Controller
 
     public function store(SeriesFormRequest $request, CriadorDeSerie $criadorSeries)
     {
+        dd($request->file('capa')->store('serie'));
         $serie = $criadorSeries->criarSerie(
+            $request->nome,
+            $request->qtd_temporadas,
+            $request->qtd_episodios,
+            $request->capa
+        );
+
+        $eventoNovaSerie = new EventoNovaSerie(
             $request->nome,
             $request->qtd_temporadas,
             $request->qtd_episodios
         );
+        
+        event($eventoNovaSerie);
 
         $request->session()
             ->flash(

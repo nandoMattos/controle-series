@@ -1,12 +1,21 @@
 <?php
 
-use App\Http\Controllers\EntrarController;
-use App\Http\Controllers\EpisodiosController;
-use App\Http\Controllers\RegistroController;
-use App\Http\Controllers\SeriesController;
-use App\Http\Controllers\TemporadasController;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\{
+    EntrarController,
+    EpisodiosController,
+    RegistroController,
+    SeriesController,
+    TemporadasController
+};
+
+use App\Mail\NovaSerie;
+
+use Illuminate\Support\Facades\{
+    Artisan,
+    Auth,
+    Mail,
+    Route
+};
 
 /*
 |--------------------------------------------------------------------------
@@ -40,6 +49,26 @@ Route::post('/temporadas/{temporada}/episodios/assistir', [EpisodiosController::
 Route::get('/logout', function () {
     Auth::logout();
     return redirect('/entrar');
+});
+
+Route::get('/email', function() {
+    return new NovaSerie('Euphoria', 3, 12);
+});
+
+Route::get('/enviar-email', function() {
+    $email = new NovaSerie('Euphoria', 3, 12);
+    $user = (object)[
+        'email' => 'luizfernandomattos20099@gmail.com',
+        'name' => 'Luiz Fernando'
+    ];
+    Mail::to($user)->send($email);
+    return 'Email enviado!';
+});
+
+Route::get('/linkstorage', function () {
+    $exitCode = Artisan::call('storage:link', [] );
+    echo $exitCode; // 0 exit code for no errors.
+
 });
 
 require __DIR__.'/auth.php';
